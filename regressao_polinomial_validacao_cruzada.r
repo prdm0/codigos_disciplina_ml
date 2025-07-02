@@ -33,7 +33,6 @@ gerando_dados <- function(n = 350L, ...) {
   f <- function(x, sd = 0.5, ...) {
     45 * tanh(x / 1.9 - 7) + 57 + rnorm(n, sd = sd)
     #45 * tanh(x)^3 + 4 + rnorm(n = n, ...)
-    #x^7 + rnorm(n = n, ...)
   }
 
   tibble(x = runif(n = n, min = .Machine$double.xmin, max = 35)) |>
@@ -74,7 +73,7 @@ set.seed(123)
 dados <- gerando_dados(n = 150, mean = 0, sd = 5.5)
 
 #! Conjunto de validação cruzada
-cv <- validacao_cruzada(dados, k = 5L)
+cv <- validacao_cruzada(dados, k = 10L)
 
 r <- tunagem(cv, p_max = 25)
 r |>
