@@ -30,24 +30,21 @@ validacao_cruzada <- function(x, k = 3L) {
 #! Função de regressão real
 gerando_dados <- function(n = 350L, ...) {
   f <- function(x, sd = 0.5, ...) {
-    #45 * tanh(x / 1.9 - 7) + 57 + rnorm(n, sd = sd)
-    45 * tanh(x)^7 + 4 + rnorm(n = n, ...)
+    45 * tanh(x / 1.9 - 7) + 57 + rnorm(n, sd = sd)
+    #45 * tanh(x)^3 + 4 + rnorm(n = n, ...)
+    #x^7 + rnorm(n = n, ...)
   }
 
-  tibble(x = runif(n = n, min = 0, max = 20)) |>
+  tibble(x = runif(n = n, min = .Machine$double.xmin, max = 35)) |>
     mutate(y = f(x, ...)) |>
     relocate(y, .before = x)
 }
 
-set.seed(123)
-dados <- gerando_dados(n = 250, mean = 0, sd = 3.5)
-
-#! Conjunto de validação cruzada
-cv <- validacao_cruzada(dados, k = 10L)
-
 tunagem <- function(cv, p_max = 25L) {
   # cv: data frame com os dados de treino e validação cruzada
   # p_max: grau máximo do polinômio a ser ajustado
+
+  k <- max(cv$split)
 
   regressao <- function(p, i) {
     treino <- cv |>
@@ -64,13 +61,19 @@ tunagem <- function(cv, p_max = 25L) {
       mse <- mean((pred - validacao$y)^2)
       tibble(p = p, split = i, mse = mse)
     }
-    purrr::map_dfr(.x = 1L:5L, .f = one_step)
+    purrr::map_dfr(.x = 1L:k, .f = one_step)
   }
   resultados <- purrr::map_dfr(.x = 1L:p_max, .f = avaliacao)
   resultados |>
     group_by(p) |>
     summarise(mse = mean(mse))
 }
+
+set.seed(123)
+dados <- gerando_dados(n = 200, mean = 0, sd = 5.5)
+
+#! Conjunto de validação cruzada
+cv <- validacao_cruzada(dados, k = 5L)
 
 r <- tunagem(cv, p_max = 25)
 r |>
