@@ -7,6 +7,7 @@ validacao_cruzada <- function(x, k = 3L) {
   # x: data frame que será dividido em k partes aproximadamente iguais
   # k: número de partes (folds) para a validação cruzada
   n <- nrow(x)
+  x <- x[sample(nrow(x)), ]
   folds <- cut(1L:n, breaks = k, labels = FALSE)
   x$folds <- folds
   treino_validacao <- function(v_fold, split) {
@@ -70,12 +71,28 @@ tunagem <- function(cv, p_max = 25L) {
 }
 
 set.seed(123)
-dados <- gerando_dados(n = 200, mean = 0, sd = 5.5)
+dados <- gerando_dados(n = 150, mean = 0, sd = 5.5)
 
 #! Conjunto de validação cruzada
-cv <- validacao_cruzada(dados, k = 5L)
+cv <- validacao_cruzada(dados, k = 3L)
 
-r <- tunagem(cv, p_max = 25)
+r <- tunagem(cv, p_max = 20)
 r |>
   ggplot(aes(x = p, y = mse)) +
   geom_line()
+
+
+# Plotando a regressao polinomial com o melhor grau
+melhor_grau <- r |>
+  filter(mse == min(mse)) |>
+  pull(p) |>
+  as.integer()
+
+modelo_final <- lm(y ~ poly(x, degree = melhor_grau), data = dados)
+dados |>
+  mutate(y_chapeu = predict(modelo_final)) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point(alpha = 0.5) +
+  geom_line(aes(y = y_chapeu), color = "blue", size = 1) +
+  labs(title = paste("Polinômio de grau", melhor_grau, "ajustado aos dados")) +
+  theme_minimal()
