@@ -74,9 +74,9 @@ set.seed(123)
 dados <- gerando_dados(n = 150, mean = 0, sd = 5.5)
 
 #! Conjunto de validação cruzada
-cv <- validacao_cruzada(dados, k = 3L)
+cv <- validacao_cruzada(dados, k = 5L)
 
-r <- tunagem(cv, p_max = 20)
+r <- tunagem(cv, p_max = 25)
 r |>
   ggplot(aes(x = p, y = mse)) +
   geom_line()
