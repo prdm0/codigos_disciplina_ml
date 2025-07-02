@@ -1,6 +1,5 @@
 library(dplyr)
 
-rm(list = ls())
 validacao_cruzada <- function(x, k = 3L) {
   # x: data frame que será dividido em k partes aproximadamente iguais
   # k: número de partes (folds) para a validação cruzada
@@ -25,5 +24,5 @@ validacao_cruzada <- function(x, k = 3L) {
   d
 }
 
-d <- validacao_cruzada(iris, k = 5)
+d <- validacao_cruzada(mtcars, k = 5)
 View(d)
