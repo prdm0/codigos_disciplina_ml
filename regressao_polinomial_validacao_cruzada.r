@@ -73,7 +73,7 @@ set.seed(123)
 dados <- gerando_dados(n = 150, mean = 0, sd = 5.5)
 
 #! Conjunto de validação cruzada
-cv <- validacao_cruzada(dados, k = 10L)
+cv <- validacao_cruzada(dados, k = 150L)
 
 r <- tunagem(cv, p_max = 25)
 r |>
@@ -92,6 +92,6 @@ dados |>
   mutate(y_chapeu = predict(modelo_final)) |>
   ggplot(aes(x = x, y = y)) +
   geom_point(alpha = 0.5) +
-  geom_line(aes(y = y_chapeu), color = "blue", size = 1) +
+  geom_line(aes(y = y_chapeu), color = "blue", linewidth = 1) +
   labs(title = paste("Polinômio de grau", melhor_grau, "ajustado aos dados")) +
   theme_minimal()
