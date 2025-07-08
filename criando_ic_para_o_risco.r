@@ -57,3 +57,16 @@ tune_res <- tune_grid(
   control = control_grid(save_pred = TRUE)
 )
 tune_res |> show_best(metric = "rmse")
+
+# Criando untervalo de confiança para o risco preditivo
+add_ci_t <- function(metrics_tbl, level = 0.95) {
+  alpha <- 1 - level
+  metrics_tbl %>%
+    mutate(
+      t_crit = qt(1 - alpha / 2, df = n - 1),
+      lower = mean - t_crit * std_err,
+      upper = mean + t_crit * std_err
+    )
+}
+add_ci_t(collect_metrics(tune_res))
+tune::int_pctl(tune_res) # via bootstrap
